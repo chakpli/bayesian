@@ -18,5 +18,5 @@
 - p1, p2,... : constant probabilities using high density regions or deterministic binnings 
 
 # to run:
-- sbt clean; sbt assembly; scala -J-Xmx1024m -cp target/scala-2.11/apple-assembly-0.0.1.jar model.Driver
+- sbt clean; sbt assembly; scala -J-Xmx1024m -cp target/scala-2.11/bayesian-assembly-0.0.1.jar model.Driver
 - output is new_label.txt
