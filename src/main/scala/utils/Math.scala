@@ -73,22 +73,22 @@ object Math {
     }
     val a = l.toArray
     val _a = a.sorted
-    val percentile = new Array[Int](a.length + 1)
-    percentile(a.length) = Int.MaxValue
+    val interval = new Array[Int](a.length + 1)
+    interval(a.length) = Int.MaxValue
     val estimate = new Array[Double](a.length + 1)
     estimate(0) = _a(0)._2
     
     _a.zipWithIndex.map{
-      case ((k, v), idx) => percentile(idx) = k; estimate(idx+1) = v}
+      case ((k, v), idx) => interval(idx) = k; estimate(idx+1) = v}
     
-    print("percentile:")
-    percentile.map(i => print(i + " "))
+    print("interval:")
+    interval.map(i => print(i + " "))
     println
     print("estimate:")
     estimate.map(i => print(i + " "))
     println
     
-    (percentile , estimate)
+    (interval , estimate)
   } 
   
   def search(s: Int, a: Array[Int]): Int = {
@@ -124,10 +124,18 @@ object Math {
   }
   
   def main(arg: Array[String]):Unit = {
-    val (percentile, estimate) = buildHDR(0.5, Array(3,3,3,2,1,4,3,1,2,2))
+    val (interval, estimate) = buildHDR(0.5, Array(3,3,3,2,1,4,3,1,2,2))
+    println("interval:")
+    interval.map(i => print(i + " "))
+    println("estimate:")
+    estimate.map(i => print(i + " "))
+    println("p for 0: " + estimate(search(0, interval)))
+    println("p for 1: " + estimate(search(1, interval)))
+    println("p for 2: " + estimate(search(2, interval)))
+    println("p for 3: " + estimate(search(3, interval)))
+    println("p for 4: " + estimate(search(4, interval)))
+    println("p for 5: " + estimate(search(5, interval)))
     
-    percentile.map(println(_))
-    estimate.map(println(_))
     /*
      * 0 -> 0
      * 2 -> 1

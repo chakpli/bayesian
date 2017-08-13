@@ -10,12 +10,12 @@
   - positions|n,c ~ MN(n, p1, p2,...,pa), 
   - clicks|n,c ~ MN(n, p1, p2,...,pb),
   - views|n,c ~ MN(n, p1, p2,...,pc), and
-  - a, b, c are contants that is pre-defined by modeler
+  - a, b, c are contants that is pre-defined by high density regions(HDR) or modeler
 
 # dotation:
 - Poi: Poisson
 - MN: Multinomial
-- p1, p2,... : constant probabilities using high density regions or deterministic binnings 
+- p1, p2,... : constant probabilities using HDR or deterministic binnings 
 
 # to run:
 - sbt clean; sbt assembly; scala -J-Xmx1024m -cp target/scala-2.11/bayesian-assembly-0.0.1.jar model.Driver

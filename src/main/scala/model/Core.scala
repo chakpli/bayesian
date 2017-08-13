@@ -29,15 +29,15 @@ abstract class Probability[D, T, P](data: D) {
   def _predict(p: T, dataToPredict: P):Option[Double]
 } 
 
-case class ProbabilityXGivenNC(data: Map[String, Array[Array[Int]]], byPercentile: Boolean, bin:Int=5, binSz:Int=1, initProb:Double=0.5) extends 
+case class ProbabilityXGivenNC(data: Map[String, Array[Array[Int]]], byHDR: Boolean, bin:Int=5, binSz:Int=1, initProb:Double=0.5) extends 
 Probability[Map[String, Array[Array[Int]]], Map[String, (Array[Int], Array[Double])], (String, Array[Int])](data){
 
   
   def _predict(p: Map[String, (Array[Int], Array[Double])], dataToPredict: (String, Array[Int])):Option[Double] ={
     val category = dataToPredict._1
-    val percentile = p.get(category) match {case None => return None; case Some(c) => c._1}
-    //print("percentile: ")
-    //percentile.map(x => print(x + " "))
+    val interval = p.get(category) match {case None => return None; case Some(c) => c._1}
+    //print("interval: ")
+    //interval.map(x => print(x + " "))
     //println()
     val estimate = p.get(category) match {case None => return None; case Some(c) => c._2}
     //print("estimate: ")
@@ -51,13 +51,13 @@ Probability[Map[String, Array[Array[Int]]], Map[String, (Array[Int], Array[Doubl
     
     data.zipWithIndex.map {
       case (v, i) =>
-        val _idx = byPercentile match {
+        val _idx = byHDR match {
           case true =>
-            if (count.isEmpty) count = Some(new Array[Int](percentile.length))
-            Math.search(v, percentile)
+            if (count.isEmpty) count = Some(new Array[Int](interval.length))
+            Math.search(v, interval)
           case false =>
             if (count.isEmpty) count = Some(new Array[Int](bin))
-            val p = percentile
+            val p = interval
             if (v < p(0)) 0
             else if (v > p(p.length - 1)) p.length - 1
             else v / binSz
@@ -71,10 +71,10 @@ Probability[Map[String, Array[Array[Int]]], Map[String, (Array[Int], Array[Doubl
   
   
   def trainParams(): Map[String, (Array[Int], Array[Double])] = {
-    val percentile = HashMap[String, Array[Int]]()
+    val interval = HashMap[String, Array[Int]]()
     val estimate = HashMap[String, Array[Double]]()
 
-    byPercentile match {
+    byHDR match {
       case true =>
         val __data = HashMap[String, HashMap[Int, Int]]()
         data.map {
@@ -90,15 +90,15 @@ Probability[Map[String, Array[Array[Int]]], Map[String, (Array[Int], Array[Doubl
           case (x, hm) =>
             val a = new ArrayBuffer[(Int, Int)]()
             hm.map { case (k, v) => a.append((v, k)) }
-            val (_percentile, _estimate) = Math.buildHDR(initProb, a.toArray)
-            percentile.put(x, _percentile)
+            val (_interval, _estimate) = Math.buildHDR(initProb, a.toArray)
+            interval.put(x, _interval)
             estimate.put(x, _estimate)
         }
       case false =>
-        data.map { case (k, v) => percentile.put(k, (0 until bin).map(i=>i*binSz).toArray) }
+        data.map { case (k, v) => interval.put(k, (0 until bin).map(i=>i*binSz).toArray) }
     }
 
-    byPercentile match {
+    byHDR match {
       case true =>
       case false =>
         data.map {
@@ -112,7 +112,7 @@ Probability[Map[String, Array[Array[Int]]], Map[String, (Array[Int], Array[Doubl
                 val count = new Array[Int](bin)
                 i.map(
                   j => {
-                    val p = percentile.get(x).get
+                    val p = interval.get(x).get
                     val idx =
 
                       if (j < p(0)) 0
@@ -132,9 +132,9 @@ Probability[Map[String, Array[Array[Int]]], Map[String, (Array[Int], Array[Doubl
     }
     
     val param = HashMap[String, (Array[Int], Array[Double])]()
-    estimate.map{case (x,y) => param.put(x, (percentile.get(x).get,y))}
+    estimate.map{case (x,y) => param.put(x, (interval.get(x).get,y))}
     //println("xnc params trained: ")
-    //param.map{ case (k, v) => println("cat:" + k); print("percentile:") ; v._1.map(x => print(x + " ")); println(); print("estimate:") ; v._2.map(x => print(x + " ")); println(); }
+    //param.map{ case (k, v) => println("cat:" + k); print("interval:") ; v._1.map(x => print(x + " ")); println(); print("estimate:") ; v._2.map(x => print(x + " ")); println(); }
     param.toMap
   }
 }
