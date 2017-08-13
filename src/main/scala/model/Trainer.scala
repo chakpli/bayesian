@@ -99,7 +99,7 @@ case class Trainer() {
     ProbabilityXGivenNCPosition = Some(ProbabilityXGivenNC(_positionMap.toMap, false, bin=10, binSz=3))
     ProbabilityXGivenNCPosition.get.train()
     println("training pcnc...")
-    ProbabilityXGivenNCClicks = Some(ProbabilityXGivenNC(_clicksMap.toMap, true, bin=5, binSz=2))
+    ProbabilityXGivenNCClicks = Some(ProbabilityXGivenNC(_clicksMap.toMap, false, bin=5, binSz=2))
     ProbabilityXGivenNCClicks.get.train()
     println("training pvnc...")
     ProbabilityXGivenNCViews = Some(ProbabilityXGivenNC(_viewsMap.toMap, false, bin=5, binSz=5))
